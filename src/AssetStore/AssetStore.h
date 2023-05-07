@@ -16,7 +16,7 @@ class AssetStore {
 
         void ClearAssets();
         void AddTexture(SDL_Renderer* renderer, const std::string& assetId, const std::string& filePath);
-        SDL_Texture* GetTexture(const std::string& assetId);
+        SDL_Texture* GetTexture(const std::string& assetId) const;
 };
 
 #endif

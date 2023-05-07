@@ -14,7 +14,7 @@ class RenderSystem: public System {
             RequireComponent<SpriteComponent>();
         }
 
-        void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
+        void Update(SDL_Renderer* renderer, const AssetStore& assetStore) {
             for(auto entity : GetSystemEntities()) {
                 const auto transform = entity.GetComponent<TransformComponent>();
                 const auto sprite = entity.GetComponent<SpriteComponent>();
@@ -32,7 +32,7 @@ class RenderSystem: public System {
 
                 SDL_RenderCopyEx(
                     renderer,
-                    assetStore->GetTexture(sprite.assetId),
+                    assetStore.GetTexture(sprite.assetId),
                     &srcRect,
                     &dstRect,
                     transform.rotation,

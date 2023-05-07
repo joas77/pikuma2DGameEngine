@@ -11,7 +11,6 @@ Game::Game() :
     isRunning{false}
 {
     registry = std::make_unique<Registry>();
-    assetStore = std::make_unique<AssetStore>();
     Logger::Log("Game Constructor called");
 }
 
@@ -87,9 +86,9 @@ void Game::Setup() {
 
     // Add assets to the asset store
     const std::string tankSpriteId = "tank-image";
-    assetStore->AddTexture(renderer, tankSpriteId, "./assets/images/tank-panther-right.png");
+    assetStore.AddTexture(renderer, tankSpriteId, "./assets/images/tank-panther-right.png");
                                                    
-    assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+    assetStore.AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
 
     // Create some entities
     Entity tank = registry->CreateEntity();
