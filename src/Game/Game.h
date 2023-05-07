@@ -27,6 +27,7 @@ class Game {
         void Initialize();
         void ProcessInput();
         void Setup();
+        void LoadLevel(int level);
         void Update();
         void Render();
         void Run();

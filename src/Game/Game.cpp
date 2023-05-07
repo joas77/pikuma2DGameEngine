@@ -79,7 +79,7 @@ void Game::ProcessInput() {
     }
 }
 
-void Game::Setup() {
+void Game::LoadLevel(int level) {
     // Add the systems that need to be processed in our game
     registry->AddSystem<MovementSystem>();
     registry->AddSystem<RenderSystem>();
@@ -87,8 +87,17 @@ void Game::Setup() {
     // Add assets to the asset store
     const std::string tankSpriteId = "tank-image";
     assetStore.AddTexture(renderer, tankSpriteId, "./assets/images/tank-panther-right.png");
-                                                   
     assetStore.AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+
+    // TODO:
+    // Load the tilemap
+    // We need to load the tilemap from
+    // ./assets/tilemaps/jungle.png
+    // We need to load the file:
+    // ./assets/tilemaps/jungle.map
+
+    // Tip: you can use the idea of the source rectangle
+    // Tip: Consider creating one entity per tile
 
     // Create some entities
     Entity tank = registry->CreateEntity();
@@ -102,7 +111,10 @@ void Game::Setup() {
     truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
     truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
     truck.AddComponent<SpriteComponent>("truck-image", 32, 32);
+}
 
+void Game::Setup() {
+    LoadLevel(1);
 }
 
 void Game::Update() {
