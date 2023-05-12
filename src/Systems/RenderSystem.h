@@ -15,6 +15,10 @@ class RenderSystem: public System {
         }
 
         void Update(SDL_Renderer* renderer, const AssetStore& assetStore) {
+            // TODO: sort all the entities of our system by z-index
+            // ...
+
+            // Loop all entities that system is interested in
             for(auto entity : GetSystemEntities()) {
                 const auto transform = entity.GetComponent<TransformComponent>();
                 const auto sprite = entity.GetComponent<SpriteComponent>();
