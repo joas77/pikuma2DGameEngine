@@ -8,7 +8,8 @@ INCLUDE_PATH := -I"./libs/"
 SRC_COMPONENTS := ./src/Game/*.cpp \
 				  ./src/Logger/*.cpp \
 				  ./src/ECS/*.cpp \
-				  ./src/AssetStore/*.cpp
+				  ./src/AssetStore/*.cpp \
+				  ./src/Utils/*.cpp
 
 SRC_FILES 	:= 	./src/*.cpp $(SRC_COMPONENTS)
 LINKER_FLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua5.3
