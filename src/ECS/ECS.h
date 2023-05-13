@@ -7,6 +7,8 @@
 #include <typeindex>
 #include <set>
 #include <memory>
+#include <functional>
+#include <algorithm>
 #include "../Logger/Logger.h"
 
 constexpr unsigned int MAX_COMPONENTS = 32;
@@ -75,6 +77,9 @@ class System {
         Signature componentSignature;
         using EntitiesContainer = std::vector<Entity>;
         EntitiesContainer entities;
+
+    protected:
+        void sortEntities(std::function<bool(const Entity& , const Entity& )>&& lambda);
 
     public:
         System() = default;

@@ -1,6 +1,7 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
+#include <algorithm>
 #include <SDL2/SDL.h>
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
@@ -15,13 +16,18 @@ class RenderSystem: public System {
         }
 
         void Update(SDL_Renderer* renderer, const AssetStore& assetStore) {
-            // TODO: sort all the entities of our system by z-index
-            // ...
+
+            auto lambda = [](const Entity& entA, const Entity& entB) {
+                    const auto& spriteA = entA.GetComponent<SpriteComponent>();
+                    const auto& spriteB = entB.GetComponent<SpriteComponent>();
+                    return spriteA.zIndex < spriteB.zIndex;
+            };
+            sortEntities(lambda);
 
             // Loop all entities that system is interested in
-            for(auto entity : GetSystemEntities()) {
-                const auto transform = entity.GetComponent<TransformComponent>();
-                const auto sprite = entity.GetComponent<SpriteComponent>();
+            for(auto& entity : GetSystemEntities()) {
+                const auto& transform = entity.GetComponent<TransformComponent>();
+                const auto& sprite = entity.GetComponent<SpriteComponent>();
 
                 // Set the source rectangle of our original sprite texture
                 SDL_Rect srcRect = sprite.srcRect;
@@ -45,6 +51,7 @@ class RenderSystem: public System {
                 );
             }
         }
+
 };
 
 #endif

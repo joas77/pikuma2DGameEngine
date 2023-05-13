@@ -28,6 +28,10 @@ const std::vector<Entity>& System::GetSystemEntities() const {
     return entities;
 }
 
+void System::sortEntities(std::function<bool(const Entity&, const Entity&)>&& lambda) {
+    std::sort(entities.begin(), entities.end(), lambda);
+}
+
 const Signature& System::GetComponentSignature() const {
     return componentSignature;
 }
