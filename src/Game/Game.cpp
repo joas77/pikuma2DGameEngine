@@ -4,8 +4,10 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../Components/AnimationComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
+#include "../Systems/AnimationSystem.h"
 #include "../Utils/TilemapLoader.h"
 
 Game::Game() : 
@@ -84,6 +86,7 @@ void Game::LoadLevel(int level) {
     // Add the systems that need to be processed in our game
     registry->AddSystem<MovementSystem>();
     registry->AddSystem<RenderSystem>();
+    registry->AddSystem<AnimationSystem>();
 
     // Add assets to the asset store
     const std::string tankSpriteId = "tank-image";
@@ -92,11 +95,13 @@ void Game::LoadLevel(int level) {
     const auto tileMapPng = std::string{"./assets/tilemaps/jungle.png"};
     const auto tileMapSpriteId = std::string{"tile-map"};
     assetStore.AddTexture(renderer, tileMapSpriteId, tileMapPng);
+    assetStore.AddTexture(renderer, "chopper-image", "./assets/images/chopper.png");
+    assetStore.AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 
     constexpr int tileSize = 32;
     constexpr double tileScale = 2.5;
     TileMapLoader tilemapLoader("./assets/tilemaps/jungle.map", "./assets/tilemaps/jungle.png", tileSize);
-    //std::vector<Entity> backgroundEntities;
+
     auto map = tilemapLoader.getMap();
     for (const auto& tile : map) {
         auto tileBackground = registry->CreateEntity();
@@ -105,15 +110,23 @@ void Game::LoadLevel(int level) {
             glm::vec2(tileScale, tileScale)
         );
         tileBackground.AddComponent<SpriteComponent>(tileMapSpriteId, tileSize, tileSize, 0, tile.pixelSrcPosition.x, tile.pixelSrcPosition.y);
-        //backgroundEntities.push_back(tileBackground);
     }
 
-    // Create some entities
-    Entity tank = registry->CreateEntity();
+    Entity chopper = registry->CreateEntity();
+    chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 100.0), glm::vec2(1.5, 1.5), 0.0);
+    chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+    chopper.AddComponent<SpriteComponent>("chopper-image", tileSize, tileSize, 3);
+    chopper.AddComponent<AnimationComponent>(2, 15, true);
 
-    // Add some components to that entity
-    tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.5, 1.5), 0.0);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0.0));
+    Entity radar = registry->CreateEntity();
+    radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 100, 10.0), glm::vec2(1.5, 1.5), 0.0);
+    radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+    radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2);
+    radar.AddComponent<AnimationComponent>(8, 5, true);
+
+    Entity tank = registry->CreateEntity();
+    tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.5, 1.5), 0.0);
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
     tank.AddComponent<SpriteComponent>(tankSpriteId, tileSize, tileSize, 2);
 
     Entity truck = registry->CreateEntity();
@@ -144,6 +157,7 @@ void Game::Update() {
 
     // Ask all the systems to update
     registry->GetSystem<MovementSystem>().Update(deltaTime);
+    registry->GetSystem<AnimationSystem>().Update();
 }
 
 void Game::Render() {
