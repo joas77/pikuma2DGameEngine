@@ -18,7 +18,7 @@ class Game {
         SDL_Window* window;
         SDL_Renderer* renderer;
 
-        std::unique_ptr<Registry> registry;
+        Registry registry;
         AssetStore assetStore;
 
     public:
