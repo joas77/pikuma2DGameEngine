@@ -10,10 +10,10 @@
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
+#include "../Systems/RenderColliderSystem.h"
 #include "../Utils/TilemapLoader.h"
 
-Game::Game() : 
-    isRunning{false}
+Game::Game()
 {
     Logger::Log("Game Constructor called");
 }
@@ -76,6 +76,9 @@ void Game::ProcessInput() {
             if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             }
+            else if(sdlEvent.key.keysym.sym == SDLK_d) {
+                isDebugging = !isDebugging;
+            }
             break;
         default:
             break;
@@ -89,6 +92,7 @@ void Game::LoadLevel(int level) {
     registry.AddSystem<RenderSystem>();
     registry.AddSystem<AnimationSystem>();
     registry.AddSystem<CollisionSystem>();
+    registry.AddSystem<RenderColliderSystem>();
 
     // Add assets to the asset store
     const std::string tankSpriteId = "tank-image";
@@ -171,7 +175,9 @@ void Game::Render() {
 
     // Invoke all the systems that need to render
     registry.GetSystem<RenderSystem>().Update(renderer, assetStore);
-
+    if(isDebugging) {
+        registry.GetSystem<RenderColliderSystem>().Update(renderer);
+    }
     SDL_RenderPresent(renderer);
 }
 

@@ -13,10 +13,11 @@ constexpr int MILLISECS_PER_FRAME =  1000 / FPS;
 
 class Game {
     private:
-        bool isRunning;
+        bool isRunning = false;
+        bool isDebugging = false;
         int millisecondsPreviousFrame = 0;
-        SDL_Window* window;
-        SDL_Renderer* renderer;
+        SDL_Window* window = nullptr;
+        SDL_Renderer* renderer = nullptr;
 
         Registry registry;
         AssetStore assetStore;
