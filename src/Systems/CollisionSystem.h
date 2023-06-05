@@ -14,17 +14,24 @@ class CollisionSystem: public System {
 
         void Update() {
             auto& entities = GetSystemEntities();
-            for(auto it = entities.begin(); it != entities.end() - 1; ++it ) {
-                const auto& entityA = *it;
-                for(auto loopIt = it + 1; loopIt != entities.end(); ++loopIt) {
-                    const auto& entityB = *loopIt;
+            for(auto it = entities.begin(); it != entities.end(); ++it ) {
+                auto entityA = *it;
+                for(auto loopIt = it; loopIt != entities.end(); ++loopIt) {
+                    if(it == loopIt) continue;
+                    auto entityB = *loopIt;
                     if( entityA != entityB &&
                         entityA.HasComponent<BoxColliderComponent>() &&
                         entityB.HasComponent<BoxColliderComponent>() &&
-                        isCollision(entityA, entityB))
-                            Logger::Log("JULIO_DEBUG: collision detected! between entity " + 
-                        std::to_string(it->GetId()) + " and " + std::to_string(loopIt->GetId())
-                    );
+                        isCollision(entityA, entityB)) {
+
+                        Logger::Log("JULIO_DEBUG: collision detected! between entity " +
+                            std::to_string(it->GetId()) + " and " + std::to_string(loopIt->GetId())
+                        );
+                        entityA.Kill();
+                        entityB.Kill();
+
+                        // TODO: emit an event
+                    }
                 }
             }
         }

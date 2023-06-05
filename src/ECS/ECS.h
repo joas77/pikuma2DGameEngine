@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <set>
+#include <deque>
 #include <memory>
 #include <functional>
 #include <algorithm>
@@ -42,6 +43,7 @@ class Entity {
         std::size_t id;
     public:
         Entity(std::size_t id) : id(id) {};
+        void Kill();
         std::size_t GetId() const;
 
         Entity& operator =(const Entity& other) = default;
@@ -87,7 +89,7 @@ class System {
 
         void AddEntityToSystem(Entity entity);
         void RemoveEntityFromSystem(Entity entity);
-        const std::vector<Entity>& GetSystemEntities() const;
+        std::vector<Entity>& GetSystemEntities();
         const Signature& GetComponentSignature() const;
 
         // Define the component type T that entities must have to be
@@ -184,6 +186,9 @@ class Registry {
         std::set<Entity> entitiesToBeAdded;
         std::set<Entity> entitiesToBeKilled;
 
+        // List of free entity ids that were previously removed
+        std::deque<int> freeIds;
+
     public:
         Registry() {
             Logger::Log("Registry constructor called");
@@ -199,6 +204,7 @@ class Registry {
 
         // Entity management
         Entity CreateEntity();
+        void KillEntity(Entity entity);
         
         // Component management
         template <typename TComponent, typename ...Targs>
@@ -228,9 +234,9 @@ class Registry {
         template <typename TSystem>
         TSystem& GetSystem() const;
 
-        // Checks the component signature of an entity and add the
-        // entity to the systems that are interested in it.
+        // Add and remove entities from their systems
         void AddEntityToSystems(Entity entity);
+        void RemoveEntityFromSystems(Entity entity);
 };
 
 template <typename TSystem, typename ...Targs>
