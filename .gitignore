@@ -1,4 +1,4 @@
 # vscode stuff
 .vscode
-./gameengine
+gameengine
 ./debug/

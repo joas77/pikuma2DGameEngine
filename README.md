@@ -5,3 +5,9 @@
 
  to check the course go to:
  https://courses.pikuma.com/
+
+ ## Dependencies
+ Install libraries in linux
+ ```
+ sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev liblua5.3-dev
+ ```
