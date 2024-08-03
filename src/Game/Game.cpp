@@ -176,7 +176,8 @@ void Game::Update()
     // Store the current frame time
     millisecondsPreviousFrame = SDL_GetTicks();
 
-    // Res
+    // Reset all event handlers for the current frame
+    eventBus.Reset();
 
     // Perform the subscription of the events for all systems
     registry.GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
