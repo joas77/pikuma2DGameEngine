@@ -3,7 +3,7 @@
 #################################################
 CC := g++
 LANG_STD := -std=c++17
-COMPILER_FLAGS := -Wall -Wfatal-errors -g
+COMPILER_FLAGS := -Wall -g
 INCLUDE_PATH := -I"./libs/"
 SRC_COMPONENTS := ./src/Game/*.cpp \
 				  ./src/Logger/*.cpp \

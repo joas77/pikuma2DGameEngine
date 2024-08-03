@@ -11,6 +11,7 @@
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderColliderSystem.h"
+#include "../Systems/DamageSystem.h"
 #include "../Utils/TilemapLoader.h"
 
 Game::Game()
@@ -18,12 +19,15 @@ Game::Game()
     Logger::Log("Game Constructor called");
 }
 
-Game::~Game() {
+Game::~Game()
+{
     Logger::Log("Game Destructor called");
 }
 
-void Game::Initialize() {
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+void Game::Initialize()
+{
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
         Logger::Err("Error initializing SDL.");
         return;
     }
@@ -32,22 +36,23 @@ void Game::Initialize() {
     SDL_GetCurrentDisplayMode(0, &displayMode);
     windowWidth = displayMode.w;
     windowHeight = displayMode.h;
-    
+
     window = SDL_CreateWindow(
         NULL,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         windowWidth,
         windowHeight,
-        SDL_WINDOW_BORDERLESS
-    );
+        SDL_WINDOW_BORDERLESS);
 
-    if(!window) {
+    if (!window)
+    {
         Logger::Err("Error creating SDL window");
         return;
     }
     renderer = SDL_CreateRenderer(window, -1, 0);
-    if(!renderer) {
+    if (!renderer)
+    {
         Logger::Err("Error creating SDL renderer.");
     }
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -55,28 +60,34 @@ void Game::Initialize() {
     isRunning = true;
 }
 
-void Game::Run() {
+void Game::Run()
+{
     Setup();
-    while (isRunning) {
+    while (isRunning)
+    {
         ProcessInput();
         Update();
         Render();
     }
 }
 
-void Game::ProcessInput() {
+void Game::ProcessInput()
+{
     SDL_Event sdlEvent;
-    while(SDL_PollEvent(&sdlEvent)) {
+    while (SDL_PollEvent(&sdlEvent))
+    {
         switch (sdlEvent.type)
         {
         case SDL_QUIT:
             isRunning = false;
             break;
         case SDL_KEYDOWN:
-            if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
+            if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+            {
                 isRunning = false;
             }
-            else if(sdlEvent.key.keysym.sym == SDLK_d) {
+            else if (sdlEvent.key.keysym.sym == SDLK_d)
+            {
                 isDebugging = !isDebugging;
             }
             break;
@@ -86,13 +97,15 @@ void Game::ProcessInput() {
     }
 }
 
-void Game::LoadLevel(int level) {
+void Game::LoadLevel(int level)
+{
     // Add the systems that need to be processed in our game
     registry.AddSystem<MovementSystem>();
     registry.AddSystem<RenderSystem>();
     registry.AddSystem<AnimationSystem>();
     registry.AddSystem<CollisionSystem>();
     registry.AddSystem<RenderColliderSystem>();
+    registry.AddSystem<DamageSystem>();
 
     // Add assets to the asset store
     const std::string tankSpriteId = "tank-image";
@@ -109,12 +122,12 @@ void Game::LoadLevel(int level) {
     TileMapLoader tilemapLoader("./assets/tilemaps/jungle.map", "./assets/tilemaps/jungle.png", tileSize);
 
     auto map = tilemapLoader.getMap();
-    for (const auto& tile : map) {
+    for (const auto &tile : map)
+    {
         auto tileBackground = registry.CreateEntity();
         tileBackground.AddComponent<TransformComponent>(
             glm::vec2(tileScale * tileSize * tile.relativePosition.x, tileScale * tileSize * tile.relativePosition.y),
-            glm::vec2(tileScale, tileScale)
-        );
+            glm::vec2(tileScale, tileScale));
         tileBackground.AddComponent<SpriteComponent>(tileMapSpriteId, tileSize, tileSize, 0, tile.pixelSrcPosition.x, tile.pixelSrcPosition.y);
     }
 
@@ -143,45 +156,56 @@ void Game::LoadLevel(int level) {
     truck.AddComponent<BoxColliderComponent>(32, 32);
 }
 
-void Game::Setup() {
+void Game::Setup()
+{
     LoadLevel(1);
 }
 
-void Game::Update() {
+void Game::Update()
+{
     // If we are too fast, waste some time until we reach the MILLISECS_PER_FRAME
     int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecondsPreviousFrame);
-    if(timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) {
+    if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME)
+    {
         SDL_Delay(timeToWait);
     }
 
     // The difference in ticks since the last frame, converted to seconds.
     double deltaTime = (SDL_GetTicks() - millisecondsPreviousFrame) / 1000.0;
-    
+
     // Store the current frame time
     millisecondsPreviousFrame = SDL_GetTicks();
-    
+
+    // Res
+
+    // Perform the subscription of the events for all systems
+    registry.GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+
     // Update the registry to process the entities that are waiting to be created/deleted
     registry.Update();
 
     // Ask all the systems to update
     registry.GetSystem<MovementSystem>().Update(deltaTime);
     registry.GetSystem<AnimationSystem>().Update();
-    registry.GetSystem<CollisionSystem>().Update();
+    registry.GetSystem<CollisionSystem>().Update(eventBus);
 }
 
-void Game::Render() {
+void Game::Render()
+{
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
     // Invoke all the systems that need to render
     registry.GetSystem<RenderSystem>().Update(renderer, assetStore);
-    if(isDebugging) {
+    if (isDebugging)
+    {
         registry.GetSystem<RenderColliderSystem>().Update(renderer);
     }
     SDL_RenderPresent(renderer);
 }
 
-void Game::Destroy() {
+void Game::Destroy()
+{
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
