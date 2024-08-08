@@ -69,11 +69,11 @@ class Entity {
         class Registry* registry;
 };
 
-/*******************************************/
-// System
-/*******************************************/
-// The system process entities that contains a specific signature
-/*******************************************/
+/*******************************************
+ System
+******************************************
+ The system process entities that contains a specific signature
+*******************************************/
 class System {
     private:
         Signature componentSignature;

@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
+#include "../Utils/TilemapLoader.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
@@ -12,7 +13,7 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderColliderSystem.h"
 #include "../Systems/DamageSystem.h"
-#include "../Utils/TilemapLoader.h"
+#include "../Systems/KeyBoardmovementSystem.h"
 
 Game::Game()
 {
@@ -90,6 +91,7 @@ void Game::ProcessInput()
             {
                 isDebugging = !isDebugging;
             }
+            eventBus.EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
             break;
         default:
             break;
@@ -106,6 +108,7 @@ void Game::LoadLevel(int level)
     registry.AddSystem<CollisionSystem>();
     registry.AddSystem<RenderColliderSystem>();
     registry.AddSystem<DamageSystem>();
+    registry.AddSystem<KeyBoardMovementSystem>();
 
     // Add assets to the asset store
     const std::string tankSpriteId = "tank-image";
@@ -181,6 +184,7 @@ void Game::Update()
 
     // Perform the subscription of the events for all systems
     registry.GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+    registry.GetSystem<KeyBoardMovementSystem>().SubscribeToEvents(eventBus);
 
     // Update the registry to process the entities that are waiting to be created/deleted
     registry.Update();
@@ -189,6 +193,7 @@ void Game::Update()
     registry.GetSystem<MovementSystem>().Update(deltaTime);
     registry.GetSystem<AnimationSystem>().Update();
     registry.GetSystem<CollisionSystem>().Update(eventBus);
+    registry.GetSystem<KeyBoardMovementSystem>().Update();
 }
 
 void Game::Render()
